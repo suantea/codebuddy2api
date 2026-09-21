@@ -1,0 +1,27 @@
+{
+  "name": "codebuddy2openai",
+  "version": "1.0.0",
+  "description": "把 **WorkBuddy / CodeBuddy（腾讯代码助手）** 的桌面端登录态，转成你本机可直接使用的 **OpenAI / Anthropic 兼容 API**。",
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ShouZhuo0413/codebuddy2openai.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/ShouZhuo0413/codebuddy2openai/issues"
+  },
+  "homepage": "https://github.com/ShouZhuo0413/codebuddy2openai#readme",
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.11.5"
+  }
+}
