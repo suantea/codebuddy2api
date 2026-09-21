@@ -1,0 +1,76 @@
+#!/bin/bash
+# workbuddy2api.app launcher — 拉起 admin 服务并打开管理后台
+set -u
+APP_DIR="$(cd "$(dirname "$0")" && pwd)"
+MARKER="$APP_DIR/../.repo_root"   # Contents/.repo_root：记住仓库位置（.app 被拷到 /Applications 后仍可用）
+PORT=8787
+
+log() { echo "[$(date '+%F %T')] $*"; }
+
+resolve_repo() {
+  # 1) 标记文件  2) .app 所在仓库 (MacOS→Contents→.app→macos→根, 4 级)  3) 让用户选
+  local p
+  p="$(cat "$MARKER" 2>/dev/null || true)"
+  if [ -n "$p" ] && [ -x "$p/.venv/bin/python" ]; then echo "$p"; return; fi
+  p="$(cd "$APP_DIR/../../../.." 2>/dev/null && pwd)"
+  if [ -x "$p/.venv/bin/python" ]; then
+    echo "$p" > "$MARKER"
+    echo "$p"; return
+  fi
+  p="$(osascript -e 'tell application "System Events" to POSIX path of (choose folder with prompt "请选择 codebuddy2api 仓库目录（包含 .venv 的那个）")' 2>/dev/null || true)"
+  if [ -n "$p" ] && [ -x "$p/.venv/bin/python" ]; then
+    echo "$p" > "$MARKER"
+    echo "$p"; return
+  fi
+  echo ""
+}
+
+REPO_ROOT="$(resolve_repo)"
+
+# 已在跑？直接开页面
+if curl -s -m 2 -o /dev/null "http://127.0.0.1:$PORT/health"; then
+  log "服务已在运行，打开管理后台"
+  open "http://127.0.0.1:$PORT/admin/"
+  exit 0
+fi
+
+# 依赖检查
+if [ -z "$REPO_ROOT" ] || [ ! -x "$REPO_ROOT/.venv/bin/python" ]; then
+  osascript -e 'display dialog "未找到虚拟环境 .venv，请先在仓库目录运行：uv venv --python 3.12 && uv pip install -r requirements.txt" buttons {"好的"} with title "WorkBuddy2API" with icon stop'
+  exit 1
+fi
+
+# 凭据迁移目录（首次启动从桌面端 auth 读取）
+AUTH_DIR="$HOME/Library/Application Support/CodeBuddyExtension/Data/Public/auth"
+DATA_DIR="$REPO_ROOT/data/management"
+mkdir -p "$DATA_DIR"
+
+# 密钥：已存在则复用，不存在则生成
+KEYS_FILE="$DATA_DIR/.keys"
+if [ ! -f "$KEYS_FILE" ]; then
+  AK="$(python3 -c 'import secrets;print(secrets.token_hex(24))')"
+  CK="$(python3 -c 'import secrets;print("sk-"+secrets.token_hex(24))')"
+  printf 'ADMIN_KEY=%s\nCLIENT_KEY=%s\n' "$AK" "$CK" > "$KEYS_FILE"
+  chmod 600 "$KEYS_FILE"
+fi
+. "$KEYS_FILE"
+
+cd "$REPO_ROOT"
+log "启动服务（${REPO_ROOT}）"
+export MANAGEMENT_DATA_DIR="$DATA_DIR"
+export CODEBUDDY_AUTH_DIR="$AUTH_DIR"
+export CODEBUDDY2OPENAI_KEY="$CLIENT_KEY"
+export ADMIN_KEY="$ADMIN_KEY"
+nohup "$REPO_ROOT/.venv/bin/python" -m admin.server >> "$DATA_DIR/service.log" 2>&1 &
+
+# 等服务就绪（最多 30s）再打开后台页面
+for _ in $(seq 1 30); do
+  if curl -s -m 1 -o /dev/null "http://127.0.0.1:$PORT/health"; then
+    open "http://127.0.0.1:$PORT/admin/"
+    exit 0
+  fi
+  sleep 1
+done
+
+log "服务 30s 内未就绪，查看日志：$DATA_DIR/service.log"
+exit 1

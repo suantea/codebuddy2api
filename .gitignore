@@ -17,6 +17,9 @@ ENV/
 .DS_Store
 Thumbs.db
 
+# Mac 客户端运行时产物
+macos/workbuddy2api.app/Contents/.repo_root
+
 # 个人 / 敏感信息（绝不提交）
 *.token
 *.key

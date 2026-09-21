@@ -338,6 +338,25 @@ python3 -m admin.server
 
 ---
 
+## Mac 客户端（双击即用）
+
+`macos/workbuddy2api.app` 是一个原生 `.app` 壳，把「起服务 + 打开管理后台」变成一次双击，降低使用门槛：
+
+1. 按「3 分钟上手」装好依赖（只需一次）
+2. 把 `macos/workbuddy2api.app` 拖到 `/Applications`
+3. 双击运行 → 自动拉起管理后台服务并打开浏览器 `http://127.0.0.1:8787/admin/`
+
+首次启动自动完成密钥生成（`data/management/.keys`，权限 600）与桌面端登录态读取；再次双击时若服务已在运行，直接打开后台页面。应用图标取自 WorkBuddy 桌面端。
+
+```bash
+# 拖到 Applications（可选，放仓库里直接双击也可以）
+cp -R macos/workbuddy2api.app /Applications/
+```
+
+> `.app` 只是启动壳，功能与 `python3 -m admin.server` 完全一致（转发、多账号轮转、自动签到、Key 管理）。服务进程不在 Dock 显示（`LSUIElement`），停止服务用 `pkill -f admin.server` 或重启电脑。
+
+---
+
 ## Docker 部署
 
 如果你更习惯用 Docker，可以直接用。
