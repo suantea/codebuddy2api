@@ -346,7 +346,7 @@ python3 -m admin.server
 2. 把 `macos/workbuddy2api.app` 拖到 `/Applications`
 3. 双击运行 → 自动拉起管理后台服务并打开浏览器 `http://127.0.0.1:8787/admin/`
 
-首次启动自动完成密钥生成（`data/management/.keys`，权限 600）与桌面端登录态读取；再次双击时若服务已在运行，直接打开后台页面。应用图标取自 WorkBuddy 桌面端。
+首次启动自动完成密钥生成（`data/management/.keys`，权限 600）与桌面端登录态读取；再次双击时若服务已在运行，直接打开后台页面。应用图标为项目自有中性图标（基于上游项目名，不带任何第三方品牌）。
 
 ```bash
 # 拖到 Applications（可选，放仓库里直接双击也可以）
