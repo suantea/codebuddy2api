@@ -72,11 +72,10 @@ export CODEBUDDY2OPENAI_KEY="$CLIENT_KEY"
 export ADMIN_KEY="$ADMIN_KEY"
 nohup "$REPO_ROOT/.venv/bin/python" -m admin.server >> "$DATA_DIR/service.log" 2>&1 &
 
-# 等服务就绪（最多 30s）再打开后台页面
+# 等服务就绪（最多 30s）再弹原生窗口
 for _ in $(seq 1 30); do
   if curl -s -m 1 -o /dev/null "http://127.0.0.1:$PORT/health"; then
-    open "http://127.0.0.1:$PORT/admin/"
-    exit 0
+    exec "$APP_DIR/appwindow"
   fi
   sleep 1
 done
