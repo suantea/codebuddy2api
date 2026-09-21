@@ -20,11 +20,10 @@ Thumbs.db
 # Mac 客户端运行时产物
 macos/workbuddy2api.app/Contents/.repo_root
 
-# Tauri 构建产物（target/、node_modules/、.app bundle 与 .dmg 都是编译产物）
+# Tauri 构建产物（target/ 与 .app bundle 都是编译产物）
+node_modules/
 macos/tauri-app/src-tauri/target/
-macos/tauri-app/node_modules/
 macos/tauri-app/src-tauri/target/release/bundle/
-macos/tauri-app/package-lock.json
 
 # 个人 / 敏感信息（绝不提交）
 *.token
