@@ -48,14 +48,14 @@ mkdir -p "$DATA_DIR"
 # 密钥：已存在则复用，首次启动让用户自定义管理密码
 KEYS_FILE="$DATA_DIR/.keys"
 if [ ! -f "$KEYS_FILE" ]; then
-  # 首次：弹框让用户设管理密码，默认 admin；客户端 Key 仍自动生成
-  AK="$(osascript -e 'set u to text returned of (display dialog "设置管理后台登录密码" default answer "admin" buttons {"取消","确定"} default button 2 with icon note with title "WorkBuddy2API")' 2>/dev/null || true)"
+  # 首次：弹框让用户设管理密码，默认 admin-admin-admin-admin（≥20 字符，服务端硬要求）；客户端 Key 仍自动生成
+  AK="$(osascript -e 'set u to text returned of (display dialog "设置管理后台登录密码" default answer "admin-admin-admin-admin" buttons {"取消","确定"} default button 2 with icon note with title "WorkBuddy2API")' 2>/dev/null || true)"
   if [ -z "${AK:-}" ]; then
     osascript -e 'display dialog "未设置密码，已取消启动。" buttons {"好的"} with title "WorkBuddy2API" with icon stop'
     exit 1
   fi
-  if [ "${#AK}" -lt 4 ]; then
-    osascript -e 'display dialog "密码至少 4 个字符。" buttons {"好的"} with title "WorkBuddy2API" with icon stop'
+  if [ "${#AK}" -lt 20 ]; then
+    osascript -e 'display dialog "密码至少 20 个字符。" buttons {"好的"} with title "WorkBuddy2API" with icon stop'
     exit 1
   fi
   CK="$(python3 -c 'import secrets;print("sk-"+secrets.token_hex(24))')"
