@@ -27,10 +27,10 @@ resolve_repo() {
 
 REPO_ROOT="$(resolve_repo)"
 
-# 已在跑？直接开页面
+# 已在跑？直接弹原生窗口
 if curl -s -m 2 -o /dev/null "http://127.0.0.1:$PORT/health"; then
-  log "服务已在运行，打开管理后台"
-  open "http://127.0.0.1:$PORT/admin/"
+  log "服务已在运行，打开原生窗口"
+  exec "$APP_DIR/appwindow"
   exit 0
 fi
 
