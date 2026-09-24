@@ -43,3 +43,6 @@ wheels/
 management-access.txt
 .idea/
 
+
+# npm 产物
+macos/tauri-app/package-lock.json
